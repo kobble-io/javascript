@@ -1,4 +1,4 @@
-![Add authentication to your Single Page Application with Kobble Auth SDK.](.readme/banner.png)
+![Add authentication to your Single Page Application with Kobble Auth SDK.](https://github.com/kobble-io/auth-spa-js/blob/main/.readme/banner.png?raw=true)
 
 [![License](https://img.shields.io/:license-mit-blue.svg?style=flat)](https://opensource.org/licenses/MIT)
 ![Status](https://img.shields.io/:status-stable-green.svg?style=flat)

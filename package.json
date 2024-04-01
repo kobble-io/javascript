@@ -1,14 +1,15 @@
 {
   "name": "@kobbleio/auth-spa-js",
-  "private": true,
-  "version": "1.0.0",
+  "description": "Add authentication to your Single Page Application using Kobble in under 10 minutes.",
+  "private": false,
+  "version": "1.0.1",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "buildpack": "npm run build && npm pack",
-    "preview": "vite preview",
+    "publish": "npm run buildpack && npm publish --access public",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "jest",
