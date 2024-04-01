@@ -1,7 +1,7 @@
 export const DEFAULT_CLOCK_INTERVAL_IN_SECOND = 10
 
 export class ClockManager {
-  private intervalToClear: number | null = null
+  private intervalToClear: ReturnType<typeof setInterval> | null = null
 
   constructor(
     private tokenRefreshCallback: () => void,

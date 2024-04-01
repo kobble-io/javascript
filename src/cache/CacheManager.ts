@@ -1,6 +1,6 @@
 import type { CacheProvider } from './common'
 import { CacheKey } from './CacheKey'
-import type { DecodedIdToken } from '@/components/lib/jwt'
+import type { DecodedIdToken } from '../jwt'
 import {
   CACHE_KEY_ACCESS_TOKEN_SUFFIX,
   CACHE_KEY_ID_TOKEN_SUFFIX,

@@ -9,7 +9,7 @@ export class EventManager {
   constructor() {
     this.authStateChangedEvent = new EventPubSub<{
       user: User | null
-    }>('auth-state-changed')
+    }>()
   }
 
   publishAuthStateChangedEvent(data: { user: User | null }) {

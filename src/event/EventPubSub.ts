@@ -1,9 +1,7 @@
-import type { EventType } from './shared'
-
 export class EventPubSub<EventDataType> {
   private subscribers: Array<(data: EventDataType) => void>
 
-  constructor(private event: EventType) {
+  constructor() {
     this.subscribers = []
   }
 
