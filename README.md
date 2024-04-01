@@ -74,3 +74,19 @@ window.addEventListener('load', async () => {
 - `getAccessToken()`: Returns the user's access token (to send to Kobble Gateway).
 
 
+### Raise an issue
+
+To provide feedback or report a bug, please [raise an issue on our issue tracker](https://github.com/kobble-io/auth-spa-js/issues).
+
+___
+
+## What is Kobble?
+
+<p align="center">
+  <picture>
+    <img alt="Kobble Logo" src="https://github.com/kobble-io/auth-spa-js/blob/main/.readme/logo.png?raw=true" width="150">
+  </picture>
+</p>
+<p align="center">
+ Kobble is the one-stop solution for monetizing modern SaaS and APIs. It allows to add authentication, analytics and payment to any app in under 10 minutes.
+</p>
