@@ -2,7 +2,14 @@
   "name": "@kobbleio/auth-spa-js",
   "description": "Add authentication to your Single Page Application using Kobble in under 10 minutes.",
   "private": false,
-  "version": "1.0.3",
+  "version": "1.0.4",
+  "keywords": [
+    "kobble",
+    "auth",
+    "spa",
+    "javascript",
+    "pkce"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
