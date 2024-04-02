@@ -2,7 +2,7 @@
   "name": "@kobbleio/auth-spa-js",
   "description": "Add authentication to your Single Page Application using Kobble in under 10 minutes.",
   "private": false,
-  "version": "1.1.2",
+  "version": "1.1.3",
   "keywords": [
     "kobble",
     "auth",
@@ -38,7 +38,8 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.8.1"
   },
   "engines": {
     "node": ">=18.0.0"
