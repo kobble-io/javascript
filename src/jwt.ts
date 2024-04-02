@@ -151,7 +151,7 @@ export const verifyIdToken = (params: VerifyIdTokenParams) => {
     throw new Error('Subject (sub) claim must be a string present in the ID token')
   }
 
-  if (decoded.header.alg !== 'HS256') {
+  if (decoded.header.alg !== 'HS256' && decoded.header.alg !== 'ES256') {
     throw new Error(
       `Signature algorithm of "${decoded.header.alg}" is not supported. Expected the ID token to be signed with "HS256".`
     )

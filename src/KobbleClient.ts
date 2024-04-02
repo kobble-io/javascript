@@ -245,6 +245,11 @@ export class KobbleClient {
     return tUserToUser(token.user)
   }
 
+  public async getIdToken(): Promise<string | null> {
+    const token = await this.cacheManager.getIdToken(this.params.clientId)
+    return token?.claims.__raw || null
+  }
+
   public async isAuthenticated() {
     const user = await this.getUser()
     return !!user
