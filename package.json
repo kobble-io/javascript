@@ -16,7 +16,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "buildpack": "npm run build && npm pack",
-    "publish": "npm run buildpack && npm publish --access public",
+    "buildpublish": "npm run buildpack && npm publish --access public",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "jest",
