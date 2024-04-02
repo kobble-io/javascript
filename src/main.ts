@@ -1,9 +1,9 @@
-import { KobbleClient } from './KobbleClient.ts'
-import { KobbleClientParams } from './global.ts'
+import { KobbleClient } from './KobbleClient'
+import { KobbleClientParams } from './global'
 
 export const createKobbleClient = (params: KobbleClientParams): KobbleClient => {
   return new KobbleClient(params)
 }
 
 export * from './global'
-export * from './KobbleClient'
+export { KobbleClient } from './KobbleClient'
