@@ -20,7 +20,7 @@ import { CacheManager } from './cache/CacheManager'
 import { LocalStorageCache } from './cache/LocalStorageCache'
 import { ClockManager } from './ClockManager'
 import { EventManager } from './event/EventManager'
-import { KobbleClientParams } from './global'
+import { AuthStateChangedCallback, KobbleClientParams } from './global'
 
 export class KobbleClient {
   private operationManager: OperationManager
@@ -305,7 +305,7 @@ export class KobbleClient {
     return result.accessToken
   }
 
-  onAuthStateChanged(callback: (data: { user: User | null }) => void) {
+  onAuthStateChanged(callback: AuthStateChangedCallback) {
     this.eventManager.subscribeAuthStateChangedEvent(callback)
   }
 }

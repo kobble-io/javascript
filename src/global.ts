@@ -16,6 +16,8 @@ export type User = {
   createdAt: Date
 }
 
+export type AuthStateChangedCallback = (data: { user: User | null }) => void
+
 export interface BaseRequestTokenOptions {
   client_id: string
   scope: string
