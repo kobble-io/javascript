@@ -21,6 +21,7 @@ import { LocalStorageCache } from './cache/LocalStorageCache'
 import { ClockManager } from './ClockManager'
 import { EventManager } from './event/EventManager'
 import { AuthStateChangedCallback, KobbleClientParams } from './global'
+import { ISdkClient, SdkClient } from './SdkClient.ts'
 
 export class KobbleClient {
   private operationManager: OperationManager
@@ -28,6 +29,7 @@ export class KobbleClient {
   private cacheManager: CacheManager
   private clockManager: ClockManager
   private eventManager: EventManager
+  private sdkClient: ISdkClient
 
   constructor(private params: KobbleClientParams) {
     if (!params.domain) {
@@ -66,6 +68,8 @@ export class KobbleClient {
         user
       })
     })
+
+    this.sdkClient = new SdkClient(params.sdkBaseUrl || 'https://client-sdk.kobble.io')
   }
 
   private async prepareAuthorizeUrl(): Promise<{
@@ -305,7 +309,17 @@ export class KobbleClient {
     return result.accessToken
   }
 
+  public async getSupabaseToken() {
+    const token = await this.getAccessToken()
+
+    if (!token) {
+      return null
+    }
+
+    return this.sdkClient.getSupabaseToken(token)
+  }
+
   onAuthStateChanged(callback: AuthStateChangedCallback) {
-    this.eventManager.subscribeAuthStateChangedEvent(callback)
+    return this.eventManager.subscribeAuthStateChangedEvent(callback)
   }
 }

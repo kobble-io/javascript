@@ -40,4 +40,5 @@ export type KobbleClientParams = {
   domain: string
   clientId: string
   redirectUri: string
+  sdkBaseUrl?: string
 }
