@@ -63,13 +63,15 @@ export class KobbleClient {
 
     this.eventManager = new EventManager()
 
+    this.sdkClient = new SdkClient(params.sdkBaseUrl || 'https://client-sdk.kobble.io')
+  }
+
+  private dispatchInitialUserStateChange() {
     this.getUser().then((user) => {
       this.eventManager.publishAuthStateChangedEvent({
         user
       })
     })
-
-    this.sdkClient = new SdkClient(params.sdkBaseUrl || 'https://client-sdk.kobble.io')
   }
 
   private async prepareAuthorizeUrl(): Promise<{
@@ -131,16 +133,24 @@ export class KobbleClient {
     refreshToken: string
   }> {
     const url = this.prepareTokenUrl()
-    const authResult = await this.httpClient.post<{
-      id_token: string
-      access_token: string
-      refresh_token: string
-      expires_in: number
-    }>(url, {
-      ...params
-    })
+
+    const authResult = await this.httpClient
+      .post<{
+        id_token: string
+        access_token: string
+        refresh_token: string
+        expires_in: number
+      }>(url, {
+        ...params
+      })
+      .catch(async (error) => {
+        await this.logout()
+        throw new AuthenticationError(error.message)
+      })
 
     if (!authResult.id_token) {
+      await this.logout()
+
       throw new AuthenticationError('MissingIdToken')
     }
 
@@ -172,8 +182,6 @@ export class KobbleClient {
   public async loginWithRedirect() {
     const { url, state, nonce, redirectUri, codeVerifier, scope } = await this.prepareAuthorizeUrl()
 
-    console.log('URL:', url)
-
     this.operationManager.create({
       nonce,
       scope,
@@ -181,8 +189,6 @@ export class KobbleClient {
       state,
       redirectUri
     })
-
-    console.log('State:', state)
 
     return window.location.assign(url)
   }
@@ -247,6 +253,30 @@ export class KobbleClient {
     }
 
     return tUserToUser(token.user)
+  }
+
+  public getPortalUrl() {
+    return this.params.domain
+  }
+
+  public getPortalProfileUrl() {
+    return `${this.params.domain}/profile`
+  }
+
+  public getPortalPricingUrl() {
+    return `${this.params.domain}/pricing`
+  }
+
+  public openPortal(target: '_blank' | '_self' = '_self') {
+    return window.open(this.getPortalUrl(), target)
+  }
+
+  public openPortalProfile(target: '_blank' | '_self' = '_self') {
+    return window.open(this.getPortalProfileUrl(), target)
+  }
+
+  public openPortalPricing(target: '_blank' | '_self' = '_self') {
+    return window.open(this.getPortalPricingUrl(), target)
   }
 
   public async getIdToken(): Promise<string | null> {
@@ -320,6 +350,9 @@ export class KobbleClient {
   }
 
   onAuthStateChanged(callback: AuthStateChangedCallback) {
-    return this.eventManager.subscribeAuthStateChangedEvent(callback)
+    const handler = this.eventManager.subscribeAuthStateChangedEvent(callback)
+
+    this.dispatchInitialUserStateChange()
+    return handler
   }
 }

@@ -10,7 +10,6 @@ interface Operation {
 }
 
 const isOperation = (value: any): value is Operation => {
-  console.log('IS OPERATION', value)
   return (
     typeof value === 'object' && value.nonce && value.scope && value.codeVerifier && value.state
   )
