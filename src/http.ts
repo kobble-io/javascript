@@ -1,3 +1,5 @@
+import { SDK_USER_AGENT } from './constants.ts'
+
 export interface HttpClient {
   post<T>(url: string, body?: object): Promise<T>
 }
@@ -8,7 +10,7 @@ export const http: HttpClient = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'KobbleSpaJsClient/1.0'
+        'User-Agent': SDK_USER_AGENT
       },
       body: JSON.stringify(body)
     })

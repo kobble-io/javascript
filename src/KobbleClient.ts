@@ -9,7 +9,7 @@ import {
 } from './utils'
 
 import { DEFAULT_SCOPE } from './constants'
-import { SessionStorage } from './storage'
+import { LocalStorage } from './storage'
 import { OperationManager } from './OperationManager'
 import { AuthenticationError, InvalidStateError } from './errors'
 import type { PKCERequestTokenOptions, RefreshTokenRequestTokenOptions, User } from './global'
@@ -22,6 +22,8 @@ import { ClockManager } from './ClockManager'
 import { EventManager } from './event/EventManager'
 import { AuthStateChangedCallback, KobbleClientParams } from './global'
 import { ISdkClient, SdkClient } from './SdkClient.ts'
+import { AccessControl } from './access-control/AccessControl.ts'
+import { Logger } from './Logger.ts'
 
 export class KobbleClient {
   private operationManager: OperationManager
@@ -30,6 +32,8 @@ export class KobbleClient {
   private clockManager: ClockManager
   private eventManager: EventManager
   private sdkClient: ISdkClient
+  public acl: AccessControl
+  public logger: Logger
 
   constructor(private params: KobbleClientParams) {
     if (!params.domain) {
@@ -50,8 +54,10 @@ export class KobbleClient {
       )
     }
 
-    const storage = SessionStorage
-    this.operationManager = new OperationManager(storage, params.clientId)
+    this.logger = new Logger(params.verbose || false)
+
+    const storage = LocalStorage
+    this.operationManager = new OperationManager(storage, params.clientId, this.logger)
 
     this.httpClient = http
 
@@ -64,6 +70,11 @@ export class KobbleClient {
     this.eventManager = new EventManager()
 
     this.sdkClient = new SdkClient(params.sdkBaseUrl || 'https://client-sdk.kobble.io')
+
+    this.acl = new AccessControl(
+      params.sdkBaseUrl || 'https://client-sdk.kobble.io',
+      this.getAccessToken.bind(this)
+    )
   }
 
   private dispatchInitialUserStateChange() {
@@ -217,18 +228,28 @@ export class KobbleClient {
     }
 
     if (!operation.codeVerifier) {
+      this.logger.debug('Missing code verifier in local operation')
+
       throw new InvalidStateError('MissingCodeVerifier')
     }
 
     if (!operation.state) {
+      this.logger.debug('Missing state in local operation')
+
       throw new InvalidStateError('MissingState')
     }
 
     if (operation.state !== state) {
+      this.logger.debug(
+        `State mismatch. Operation state: ${operation.state}, Given state: ${state}`
+      )
+
       throw new InvalidStateError('StateMismatch')
     }
 
     if (!code) {
+      this.logger.debug('Missing code in the query params')
+
       throw new AuthenticationError('MissingCode')
     }
 
