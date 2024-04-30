@@ -1,4 +1,4 @@
-![Add authentication to your Single Page Application with Kobble Auth SDK.](https://github.com/kobble-io/auth-spa-js/blob/main/.readme/banner.png?raw=true)
+![Add authentication to your Single Page Application with Kobble Auth SDK.](https://github.com/kobble-io/javascript/blob/main/.readme/banner.png?raw=true)
 
 [![License](https://img.shields.io/:license-mit-blue.svg?style=flat)](https://opensource.org/licenses/MIT)
 ![Status](https://img.shields.io/:status-stable-green.svg?style=flat)
@@ -15,7 +15,7 @@ It's secure by design (using PKCE flow), easy to use, and works with any JavaScr
 Using [npm](https://npmjs.org) in your project directory run the following command:
 
 ```sh
-npm install @kobbleio/auth-spa-js
+npm install @kobbleio/javascript
 ```
 
 ### Configure Kobble
@@ -31,7 +31,7 @@ Note the **Client ID** and your **Portal Domain** values.
 Create a `KobbleClient` instance before rendering or initializing your application. You should only have one instance of the client.
 
 ```js
-import { createKobbleClient } from '@kobbleio/auth-spa-js';
+import { createKobbleClient } from '@kobbleio/javascript';
 
 const kobble = createKobbleClient({
     domain: 'https://<YOUR_PORTAL_DOMAIN>',
@@ -76,7 +76,7 @@ window.addEventListener('load', async () => {
 
 ### Raise an issue
 
-To provide feedback or report a bug, please [raise an issue on our issue tracker](https://github.com/kobble-io/auth-spa-js/issues).
+To provide feedback or report a bug, please [raise an issue on our issue tracker](https://github.com/kobble-io/javascript/issues).
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 <p align="center">
   <picture>
-    <img alt="Kobble Logo" src="https://github.com/kobble-io/auth-spa-js/blob/main/.readme/logo.png?raw=true" width="150">
+    <img alt="Kobble Logo" src="https://github.com/kobble-io/javascript/blob/main/.readme/logo.png?raw=true" width="150">
   </picture>
 </p>
 <p align="center">
