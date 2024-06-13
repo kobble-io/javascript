@@ -4,6 +4,22 @@ export interface ClientStorage {
   removeItem(key: string): void
 }
 
+export class WebExtSessionStorage implements ClientStorage {
+  private storage: Record<string, unknown> = {}
+
+  getItem(key: string): object | null {
+    return this.storage[key] ?? null
+  }
+
+  setItem(key: string, value: object) {
+    this.storage[key] = value
+  }
+
+  removeItem(key: string) {
+    delete this.storage[key]
+  }
+}
+
 export const SessionStorage = {
   getItem(key: string): object | null {
     if (!sessionStorage) {

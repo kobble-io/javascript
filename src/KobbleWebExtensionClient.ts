@@ -3,13 +3,14 @@ import {
   createQueryParams,
   encode,
   generateRandomString,
+  getBrowser,
   parseAuthenticationResult,
   sha256,
   tUserToUser
 } from './utils'
 
 import { DEFAULT_SCOPE } from './constants'
-import { LocalStorage } from './storage'
+import { WebExtSessionStorage } from './storage'
 import { OperationManager } from './OperationManager'
 import { AuthenticationError, InvalidStateError } from './errors'
 import type { PKCERequestTokenOptions, RefreshTokenRequestTokenOptions, User } from './global'
@@ -17,15 +18,15 @@ import type { HttpClient } from './http'
 import { http } from './http'
 import { verifyIdToken } from './jwt'
 import { CacheManager } from './cache/CacheManager'
-import { LocalStorageCache } from './cache/LocalStorageCache'
+import { WebExtensionCache } from './cache/LocalStorageCache'
 import { ClockManager } from './ClockManager'
 import { EventManager } from './event/EventManager'
-import { AuthStateChangedCallback, KobbleClientParams } from './global'
+import { AuthStateChangedCallback, KobbleWebExtensionClientParams } from './global'
 import { ISdkClient, SdkClient } from './SdkClient.ts'
 import { AccessControl } from './access-control/AccessControl.ts'
 import { Logger } from './Logger.ts'
 
-export class KobbleClient {
+export class KobbleWebExtensionClient {
   private operationManager: OperationManager
   private httpClient: HttpClient
   private cacheManager: CacheManager
@@ -35,7 +36,7 @@ export class KobbleClient {
   public acl: AccessControl
   public logger: Logger
 
-  constructor(private params: KobbleClientParams) {
+  constructor(private params: KobbleWebExtensionClientParams) {
     if (!params.domain) {
       throw new Error(
         'KobbleClient must be initialized with a domain. Please provide your portal domain when creating a new instance of KobbleClient'
@@ -48,20 +49,14 @@ export class KobbleClient {
       )
     }
 
-    if (!params.redirectUri) {
-      throw new Error(
-        'Missing redirect uri. Please provide your redirect uri when creating a new instance of KobbleClient'
-      )
-    }
-
     this.logger = new Logger(params.verbose || false)
 
-    const storage = LocalStorage
+    const storage = new WebExtSessionStorage()
     this.operationManager = new OperationManager(storage, params.clientId, this.logger)
 
     this.httpClient = http
 
-    const cache = new LocalStorageCache()
+    const cache = new WebExtensionCache()
     this.cacheManager = new CacheManager(cache)
 
     this.clockManager = new ClockManager(this.refreshAccessTokenIfExpired.bind(this))
@@ -101,7 +96,7 @@ export class KobbleClient {
 
     const scope = DEFAULT_SCOPE
 
-    const redirectUri = await this.getRedirectUri()
+    const redirectUri = this.getRedirectUri()
 
     const queryParams = createQueryParams({
       client_id: this.params.clientId,
@@ -121,15 +116,13 @@ export class KobbleClient {
       state,
       nonce,
       codeVerifier: code_verifier,
-      redirectUri: await this.getRedirectUri(),
+      redirectUri,
       scope
     }
   }
 
   private getRedirectUri() {
-    return typeof this.params.redirectUri === 'function'
-      ? this.params.redirectUri()
-      : this.params.redirectUri
+    return getBrowser().identity.getRedirectURL('callback')
   }
 
   private prepareTokenUrl() {
@@ -199,7 +192,10 @@ export class KobbleClient {
   }
 
   public async loginWithRedirect() {
+    this.logger.debug('Login with redirect started. Preparing authorize url...')
     const { url, state, nonce, redirectUri, codeVerifier, scope } = await this.prepareAuthorizeUrl()
+
+    this.logger.debug('Got authorize url. Creating operation...')
 
     this.operationManager.create({
       nonce,
@@ -209,10 +205,26 @@ export class KobbleClient {
       redirectUri
     })
 
-    return window.location.assign(url)
+    this.logger.debug('Operation created. Launching web auth flow...')
+
+    const browser = getBrowser()
+
+    const result = await browser.identity.launchWebAuthFlow({
+      url,
+      interactive: true
+    })
+
+    if (!result) {
+      this.logger.debug('Missing result after launch web auth flow.')
+      throw new AuthenticationError('MissingResultAfterLaunchWebAuthFlow')
+    }
+
+    this.logger.debug('Web auth flow launched. Handling redirect callback...')
+
+    return this.handleRedirectCallback(result)
   }
 
-  public async handleRedirectCallback(url: string = window.location.href) {
+  public async handleRedirectCallback(url: string) {
     const queryStringFragments = url.split('?').slice(1)
 
     if (queryStringFragments.length === 0) {
@@ -277,6 +289,7 @@ export class KobbleClient {
 
   public async getUser(): Promise<User | null> {
     const token = await this.cacheManager.getIdToken(this.params.clientId)
+
     if (!token) {
       return null
     }
@@ -297,15 +310,37 @@ export class KobbleClient {
   }
 
   public openPortal(target: '_blank' | '_self' = '_self') {
-    return window.open(this.getPortalUrl(), target)
+    if (target === '_blank') {
+      return getBrowser().tabs.create({ url: this.getPortalUrl(), active: true })
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return getBrowser().tabs.update({ url: this.getPortalUrl(), active: true })
   }
 
-  public openPortalProfile(target: '_blank' | '_self' = '_self') {
-    return window.open(this.getPortalProfileUrl(), target)
+  public async openPortalProfile(target: '_blank' | '_self' = '_self') {
+    const browser = getBrowser()
+
+    if (target === '_blank') {
+      return browser.tabs.create({ url: this.getPortalProfileUrl(), active: true })
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return browser.tabs.update({ url: this.getPortalProfileUrl() })
   }
 
   public openPortalPricing(target: '_blank' | '_self' = '_self') {
-    return window.open(this.getPortalPricingUrl(), target)
+    const browser = getBrowser()
+
+    if (target === '_blank') {
+      return browser.tabs.create({ url: this.getPortalPricingUrl(), active: true })
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return browser.tabs.update({ url: this.getPortalPricingUrl() })
   }
 
   public async getIdToken(): Promise<string | null> {
