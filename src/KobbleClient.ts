@@ -101,11 +101,9 @@ export class KobbleClient {
 
     const scope = DEFAULT_SCOPE
 
-    const redirectUri = await this.getRedirectUri()
-
     const queryParams = createQueryParams({
       client_id: this.params.clientId,
-      redirect_uri: redirectUri,
+      redirect_uri: this.params.redirectUri,
       state: state,
       nonce: nonce,
       code_challenge: code_challenge,
@@ -121,15 +119,9 @@ export class KobbleClient {
       state,
       nonce,
       codeVerifier: code_verifier,
-      redirectUri: await this.getRedirectUri(),
+      redirectUri: this.params.redirectUri,
       scope
     }
-  }
-
-  private getRedirectUri() {
-    return typeof this.params.redirectUri === 'function'
-      ? this.params.redirectUri()
-      : this.params.redirectUri
   }
 
   private prepareTokenUrl() {
