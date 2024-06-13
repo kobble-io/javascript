@@ -91,7 +91,7 @@ export type KobbleClientParams = {
    * You can use the <HandleCallback /> component to easily handle the callback.
    * [See the docs](https://docs.kobble.io/learning/quickstart/react).
    */
-  redirectUri: string | (() => Promise<string> | string)
+  redirectUri: string
   /**
    * Do not change this parameter unless you know what you are doing.
    */
