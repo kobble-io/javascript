@@ -8,6 +8,8 @@ This package helps you add authentication to your Single Page Application with K
 
 It's secure by design (using PKCE flow), easy to use, and works with any JavaScript framework.
 
+Since v1.6.0 it also supports web extensions through the `KobbleWebExtensionClient` class, more info available in our [documentation](https://docs.kobble.io).
+
 ## Getting Started
 
 ### Installation

@@ -10,19 +10,31 @@ export const generateRandomString = () => {
   return random
 }
 
+export const getBrowser = (): typeof browser | typeof chrome => {
+  if (typeof browser !== 'undefined') {
+    return browser
+  }
+
+  if (typeof chrome === 'undefined') {
+    throw new Error(
+      'Cannot find the browser or the chrome object. Make sure you are running in a web extension environment?'
+    )
+  }
+
+  return chrome
+}
+
 export const encode = (value: string) => btoa(value)
 export const decode = (value: string) => atob(value)
 
 export const getCrypto = () => {
-  if (!window) {
-    throw new Error('KobbleClient must be run in a browser environment.')
+  if (!crypto) {
+    throw new Error(
+      'KobbleClient requires crypto API to be available for security reasons. Are you running in a browser?'
+    )
   }
 
-  if (!window.crypto) {
-    throw new Error('KobbleClient requires window.crypto to be available for security reasons.')
-  }
-
-  return window.crypto
+  return crypto
 }
 
 export const sha256 = async (s: string) => {
@@ -51,7 +63,7 @@ const urlEncodeB64 = (input: string) => {
 
 export const bufferToBase64UrlEncoded = (input: ArrayBuffer) => {
   const ie11SafeInput = new Uint8Array(input)
-  return urlEncodeB64(window.btoa(String.fromCharCode(...Array.from(ie11SafeInput))))
+  return urlEncodeB64(btoa(String.fromCharCode(...Array.from(ie11SafeInput))))
 }
 
 const clearUndefined = (params: Record<any, any>) => {
